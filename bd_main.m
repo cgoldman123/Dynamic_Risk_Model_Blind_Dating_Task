@@ -27,6 +27,9 @@ DCM.estimation_prior.alone_acceptance = 0;
 DCM.estimation_prior.decision_noise = 2; % bound positive
 DCM.field = fieldnames(DCM.estimation_prior);
 
-[fit_results, fit_DCM] = fit_bd(subject, DCM);
-writetable(struct2table(fit_results), [result_dir subject '_blind_dating_fit.csv']);
+[fit_results, fit_DCM, file] = fit_bd(subject, DCM);
+mf_results = bd_model_free(file);
+fit_results = [struct2table(fit_results), struct2table(mf_results)];
+
+writetable(fit_results, [result_dir subject '_blind_dating_fit.csv']);
 save([result_dir subject '_blind_dating_fit.mat'], 'fit_DCM');

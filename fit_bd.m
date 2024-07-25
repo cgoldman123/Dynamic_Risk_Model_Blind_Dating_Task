@@ -1,4 +1,4 @@
-function [fit_results, fit_DCM] = fit_bd(subject,DCM)
+function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     dbstop if error;
     if ispc
         root = 'L:/';
