@@ -102,29 +102,39 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 
     % re-transform parameters back into native space
     field = fit_DCM.field;
+    % get fitted and fixed params
+    params = fit_DCM.params;
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh'})
-            posterior.(field{i}) = 1/(1+exp(-fit_DCM.Ep.(field{i})));
-        elseif ismember(field{i},{'date_num_thresh', 'decision_noise'})
-            posterior.(field{i}) = exp(fit_DCM.Ep.(field{i}));
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
+            params.(field{i}) = 1/(1+exp(-fit_DCM.Ep.(field{i})));
+        elseif ismember(field{i},{'decision_noise'})
+            params.(field{i}) = exp(fit_DCM.Ep.(field{i}));
         else
-            posterior.(field{i}) = fit_DCM.Ep.(field{i});
+            params.(field{i}) = fit_DCM.Ep.(field{i});
         end
     end
     
     fit_results.subject = subject;
     fit_results.has_practice_effects = has_practice_effects;
     % get final average action probability
-    model_output = bd_model(posterior,DCM.U,DCM.Y);
+    model_output = bd_model(params,DCM.U,DCM.Y);
     fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
 
     % get final model accuracy
     fit_results.model_acc = sum(model_output.action_probabilities(:)' > .5) / sum(~isnan(model_output.action_probabilities(:)'));
     
-    % assign priors/posteriors to fit_results
-    for i = 1:length(field)
-        fit_results.(['posterior_' field{i}]) = posterior.(field{i});
-        fit_results.(['prior_' field{i}]) = DCM.estimation_prior.(field{i});  
+    % assign priors/posteriors/fixed params to fit_results
+    param_names = fieldnames(params);
+    for i = 1:length(param_names)
+        % param was fitted
+        if ismember(param_names{i}, field)
+            fit_results.(['posterior_' param_names{i}]) = params.(param_names{i});
+            fit_results.(['prior_' param_names{i}]) = fit_DCM.params.(param_names{i});  
+        % param was fixed
+        else
+            fit_results.(['fixed_' param_names{i}]) = params.(param_names{i});
+    
+        end
     end
 
 end

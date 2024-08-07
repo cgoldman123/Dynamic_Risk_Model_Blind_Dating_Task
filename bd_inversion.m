@@ -58,14 +58,14 @@ for i = 1:length(DCM.field)
         pC{i,i}    = diag(param);
     else
         % transform the parameters that we fit
-        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh'})
-            pE.(field) = log(DCM.estimation_prior.(field)/(1-DCM.estimation_prior.(field)));  % bound between 0 and 1
+        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
+            pE.(field) = log(DCM.params.(field)/(1-DCM.params.(field)));  % bound between 0 and 1
             pC{i,i}    = prior_variance;
-        elseif ismember(field, {'date_num_thresh', 'decision_noise'})
-            pE.(field) = log(DCM.estimation_prior.(field));               % in log-space (to keep positive)
+        elseif ismember(field, {'decision_noise'})
+            pE.(field) = log(DCM.params.(field));               % in log-space (to keep positive)
             pC{i,i}    = prior_variance;  
         else
-            pE.(field) = DCM.estimation_prior.(field); 
+            pE.(field) = DCM.params.(field); 
             pC{i,i}    = prior_variance;
         end
     end
@@ -79,6 +79,7 @@ M.L     = @(P,M,U,Y)spm_mdp_L(P,M,U,Y);  % log-likelihood function
 M.pE    = pE;                            % prior means (parameters)
 M.pC    = pC;                            % prior variance (parameters)
 M.mdp   = DCM.MDP;                       % MDP structure
+M.params = DCM.params;                   % includes fixed and fitted params
 
 % Variational Laplace
 %--------------------------------------------------------------------------
@@ -107,12 +108,12 @@ function L = spm_mdp_L(P,M,U,Y)
 
     % multiply parameters in MDP
     %--------------------------------------------------------------------------
-    params   = struct();
+    params   = M.params; % includes fitted and fixed params. Write over fitted params below. 
     field = fieldnames(M.pE);
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh'})
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
             params.(field{i}) = 1/(1+exp(-P.(field{i})));
-        elseif ismember(field{i},{'date_num_thresh', 'decision_noise'})
+        elseif ismember(field{i},{'decision_noise'})
             params.(field{i}) = exp(P.(field{i}));
         else
             params.(field{i}) = P.(field{i});
@@ -135,7 +136,7 @@ function L = spm_mdp_L(P,M,U,Y)
     
     model_output = bd_model(params,U,Y);
     log_probs = log(model_output.action_probabilities);
-    log_probs(isnan(log_probs)) = 0; % Replace NaN in log output with 0 for summing
+    log_probs(isnan(log_probs)) = eps; % Replace NaN in log output with eps for summing
     L = sum(log_probs, 'all');
 
 

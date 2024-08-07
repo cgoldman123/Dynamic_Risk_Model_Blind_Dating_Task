@@ -1,14 +1,7 @@
 function [model_output] = bd_model(params, observations, actions)
 dbstop if error
-p_high_hazard = params.p_high_hazard;
-p_reject_start_ratio = params.p_reject_start_ratio;
-p_reject_ceiling_ratio = params.p_reject_ceiling_ratio;
-date_num_sensitivity = params.date_num_sensitivity;
-date_qual_sensitivity = params.date_qual_sensitivity;
-date_num_thresh = params.date_num_thresh; 
-date_qual_thresh = params.date_qual_thresh; 
-alone_acceptance = params.alone_acceptance; 
-decision_noise = params.decision_noise;
+% use helper function to load in variable names
+get_params(params);
 
 
 total_trials = 108;
@@ -31,11 +24,11 @@ for t = 1:T
     p_low_vec(t) = 1 - p_high_vec(t) - p_alone_vec(t);
 end
 
-%  plot([p_high_vec]') % probability that person will get the high offer
-%  hold on
-%  plot([p_alone_vec]') % probability that person will get rejected
-%  hold on
-%  plot([p_low_vec]') % probability that low offer will still be there
+ plot([p_high_vec]') % probability that person will get the high offer
+ hold on
+ plot([p_alone_vec]') % probability that person will get rejected
+ hold on
+ plot([p_low_vec]') % probability that low offer will still be there
 
 %% dynamic preference component & choice 
 
@@ -135,14 +128,21 @@ end
 %     plot(p_accept(trial,:))
 %     hold on
 % end
-action_probabilities = nan(8, total_trials);
+%action_probabilities = nan(8, total_trials);
+action_probabilities = nan(1, total_trials);
 for trial = 1:total_trials
     game = actions.choice{trial};
     T = length(game)-1; % number of decisions this person made
-    for t = 1:T
-        did_accept = game(t+1)-1;
-        action_probabilities(t, trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
-    end
+%     for t = 1:T
+%         did_accept = game(t+1)-1;
+%         action_probabilities(t, trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
+%     end
+
+    % only include probability for decision to accept initial offer, decision to wait before getting rejected,
+    % decision to wait before receiving high offer, or decision to
+    % reject on last time step. Means only looking at action on last time step
+    did_accept = game(end)-1;
+    action_probabilities(trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
 end
 
 model_output.action_probabilities = action_probabilities;
@@ -150,3 +150,9 @@ model_output.subj_date_qual = subj_percent_match;
 
 end
 
+function get_params(params)
+    param_names = fieldnames(params);
+    for i = 1:length(param_names)
+        assignin('caller', param_names{i}, params.(param_names{i}));
+    end
+end

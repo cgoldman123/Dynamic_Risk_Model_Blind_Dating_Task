@@ -16,16 +16,20 @@ end
 addpath([root '/rsmith/all-studies/util/spm12/']);
 addpath([root '/rsmith/all-studies/util/spm12/toolbox/DEM/']);
 
-DCM.estimation_prior.p_high_hazard = .4; % bound 0 and 1
-DCM.estimation_prior.p_reject_start_ratio = .8; % bound 0 and 1
-DCM.estimation_prior.p_reject_ceiling_ratio = .6; % bound 0 and 1
-DCM.estimation_prior.date_num_thresh = 100; % bound positive
-DCM.estimation_prior.date_qual_thresh = .4; % bound 0 and 1
-DCM.estimation_prior.date_num_sensitivity = 0; 
-DCM.estimation_prior.date_qual_sensitivity = 0;
-DCM.estimation_prior.alone_acceptance = 0; 
-DCM.estimation_prior.decision_noise = 2; % bound positive
-DCM.field = fieldnames(DCM.estimation_prior);
+% specify fitted and fixed parameter values; note that fieldnames
+% determines which parameters are fitted
+DCM.params.p_high_hazard = .25; % bound 0 and 1
+DCM.params.p_reject_start_ratio = .33; % bound 0 and 1
+DCM.params.p_reject_ceiling_ratio = .8; % bound 0 and 1
+DCM.params.date_num_thresh = 1; % bound 0 and 1
+DCM.params.date_qual_thresh = 1; % bound 0 and 1
+DCM.params.date_num_sensitivity = 0; % unbounded
+DCM.params.date_qual_sensitivity = 0; % unbounded
+DCM.params.alone_acceptance = 0; % unbounded
+DCM.params.decision_noise = 2; % bound positive
+DCM.field = {'alone_acceptance', 'decision_noise', 'date_num_sensitivity',...
+     'date_qual_sensitivity', 'p_high_hazard', 'p_reject_ceiling_ratio' };
+
 
 [fit_results, fit_DCM, file] = fit_bd(subject, DCM);
 mf_results = bd_model_free(file);
