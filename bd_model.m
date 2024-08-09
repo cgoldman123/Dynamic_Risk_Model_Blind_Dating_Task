@@ -14,15 +14,22 @@ total_trials = 108;
 T=8; % choice number within each game
 
 % setup dynamic risk
-p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
-p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
+% p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
+% p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
+% 
+% 
+% for t = 1:T
+%     p_high_vec(t) = p_high_hazard;
+%     p_alone_vec(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
+%     p_low_vec(t) = 1 - p_high_vec(t) - p_alone_vec(t);
+% end
 
+% stagnant risk
+p_high_vec = repmat(p_high_hazard, 1, T);
+p_reject = (1-p_high_hazard)*p_reject_ratio;
+p_alone_vec = repmat(p_reject, 1, T);
+p_low_vec = repmat(1-p_high_hazard-p_reject, 1, T);
 
-for t = 1:T
-    p_high_vec(t) = p_high_hazard;
-    p_alone_vec(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
-    p_low_vec(t) = 1 - p_high_vec(t) - p_alone_vec(t);
-end
 
  plot([p_high_vec]') % probability that person will get the high offer
  hold on
@@ -76,8 +83,8 @@ max_possible_dates_percent = nan(1,total_trials);
 max_possible_dates_percent(1) = 1;
 date_num_concern = nan(1,total_trials);
 date_qual_concern = nan(1,total_trials);
-date_num_concern(1) = date_num_thresh - total_trials;
-date_qual_concern(1) = date_qual_thresh - 0;
+date_num_concern(1) = date_num_thresh;
+date_qual_concern(1) = date_qual_thresh;
 
 for trial = 2:numel(dates)
     num_dates(trial) = num_dates(trial-1) + dates(trial-1);
@@ -89,7 +96,7 @@ end
 
 subj_percent_match = nan(total_trials);
 for trial = 1:numel(dates)
-  subj_percent_match(trial) = initial_offer(trial) + date_num_sensitivity*date_num_concern(trial) - date_qual_sensitivity*date_qual_concern(trial);
+  subj_percent_match(trial) = initial_offer_scale*initial_offer(trial) + date_num_sensitivity*date_num_concern(trial) - date_qual_sensitivity*date_qual_concern(trial);
    
     if subj_percent_match(trial) > .85
         subj_percent_match(trial) = .85;
@@ -128,21 +135,28 @@ end
 %     plot(p_accept(trial,:))
 %     hold on
 % end
-%action_probabilities = nan(8, total_trials);
-action_probabilities = nan(1, total_trials);
+action_probabilities = nan(8, total_trials);
+%action_probabilities = nan(1, total_trials);
 for trial = 1:total_trials
     game = actions.choice{trial};
+    observation = observations{trial};
     T = length(game)-1; % number of decisions this person made
-%     for t = 1:T
-%         did_accept = game(t+1)-1;
-%         action_probabilities(t, trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
-%     end
+    % include all decisions up until last one (don't count decision to
+    % accept high offer since it's automatic!
+    for t = 1:T
+        % if got high offer
+        if observation(t+1) == 90
+            break;
+        end
+        did_accept = game(t+1)-1;
+        action_probabilities(t, trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
+    end
 
     % only include probability for decision to accept initial offer, decision to wait before getting rejected,
     % decision to wait before receiving high offer, or decision to
     % reject on last time step. Means only looking at action on last time step
-    did_accept = game(end)-1;
-    action_probabilities(trial) = p_accept(trial, t)*did_accept +  (1-p_accept(trial, t)) * (1-did_accept);
+%     did_accept = game(end)-1;
+%     action_probabilities(trial) = p_accept(trial, T)*did_accept +  (1-p_accept(trial, T)) * (1-did_accept);
 end
 
 model_output.action_probabilities = action_probabilities;

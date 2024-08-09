@@ -58,10 +58,10 @@ for i = 1:length(DCM.field)
         pC{i,i}    = diag(param);
     else
         % transform the parameters that we fit
-        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
+        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio'})
             pE.(field) = log(DCM.params.(field)/(1-DCM.params.(field)));  % bound between 0 and 1
             pC{i,i}    = prior_variance;
-        elseif ismember(field, {'decision_noise'})
+        elseif ismember(field, {'decision_noise', 'initial_offer_scale'})
             pE.(field) = log(DCM.params.(field));               % in log-space (to keep positive)
             pC{i,i}    = prior_variance;  
         else
@@ -111,9 +111,9 @@ function L = spm_mdp_L(P,M,U,Y)
     params   = M.params; % includes fitted and fixed params. Write over fitted params below. 
     field = fieldnames(M.pE);
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio'})
             params.(field{i}) = 1/(1+exp(-P.(field{i})));
-        elseif ismember(field{i},{'decision_noise'})
+        elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(P.(field{i}));
         else
             params.(field{i}) = P.(field{i});

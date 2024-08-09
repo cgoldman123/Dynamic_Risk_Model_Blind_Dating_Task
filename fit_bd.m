@@ -22,6 +22,7 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
         disp("WARNING, MULTIPLE BEHAVIORAL FILES FOUND FOR THIS ID. USING THE FIRST FULL ONE")
     end
 
+    has_complete_file = false;
     for k = 1:length(index_array)
         file_index = index_array(k);
         file = [file_path sortedDirectory(file_index).name];
@@ -42,6 +43,12 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
         if strcmp(class(subdat.response_time),"cell")
            subdat.response_time = str2double(subdat.response_time);
         end
+        
+        has_complete_file = true;
+        break
+    end
+    if ~has_complete_file
+        error("This subject does not have a complete behavioral file");
     end
 
     %1x108 struct: choice, observation, reaction time
@@ -105,9 +112,9 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     % get fitted and fixed params
     params = fit_DCM.params;
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh'})
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh', 'p_reject_ratio'})
             params.(field{i}) = 1/(1+exp(-fit_DCM.Ep.(field{i})));
-        elseif ismember(field{i},{'decision_noise'})
+        elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(fit_DCM.Ep.(field{i}));
         else
             params.(field{i}) = fit_DCM.Ep.(field{i});
