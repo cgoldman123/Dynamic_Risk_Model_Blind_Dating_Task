@@ -11,31 +11,39 @@ total_trials = 108;
 
 %% dynamic risk component
 
-T=8; % choice number within each game
 
-% setup dynamic risk
-% p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
-% p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
-% 
-% 
-% for t = 1:T
-%     p_high_vec(t) = p_high_hazard;
-%     p_alone_vec(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
-%     p_low_vec(t) = 1 - p_high_vec(t) - p_alone_vec(t);
-% end
+%setup dynamic risk
+p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
+p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
+
+T=4;
+for t = 1:T
+    p_high_vec_4_choice(t) = p_high_hazard;
+    p_alone_vec_4_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
+    p_low_vec_4_choice(t) = 1 - p_high_vec_4_choice(t) - p_alone_vec_4_choice(t);
+end
+T=8; % choice number within each game
+for t = 1:T
+    p_high_vec_8_choice(t) = p_high_hazard;
+    p_alone_vec_8_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
+    p_low_vec_8_choice(t) = 1 - p_high_vec_8_choice(t) - p_alone_vec_8_choice(t);
+end
+
+
+
 
 % stagnant risk
-p_high_vec = repmat(p_high_hazard, 1, T);
-p_reject = (1-p_high_hazard)*p_reject_ratio;
-p_alone_vec = repmat(p_reject, 1, T);
-p_low_vec = repmat(1-p_high_hazard-p_reject, 1, T);
+% p_high_vec = repmat(p_high_hazard, 1, T);
+% p_reject = (1-p_high_hazard)*p_reject_ratio;
+% p_alone_vec = repmat(p_reject, 1, T);
+% p_low_vec = repmat(1-p_high_hazard-p_reject, 1, T);
 
 
- plot([p_high_vec]') % probability that person will get the high offer
- hold on
- plot([p_alone_vec]') % probability that person will get rejected
- hold on
- plot([p_low_vec]') % probability that low offer will still be there
+%  plot([p_high_vec]') % probability that person will get the high offer
+%  hold on
+%  plot([p_alone_vec]') % probability that person will get rejected
+%  hold on
+%  plot([p_low_vec]') % probability that low offer will still be there
 
 %% dynamic preference component & choice 
 
@@ -49,9 +57,9 @@ for i = 1:total_trials
         percent_match(i) = 0;
     elseif actions.choice{i}(end) == 2
         dates(i) = 1;
-        percent_match(i) = observations{i}(end)/100;
+        percent_match(i) = observations.obs{i}(end)/100;
     end
-    initial_offer(i) = observations{i}(1)/100;
+    initial_offer(i) = observations.obs{i}(1)/100;
 end
 
 percent_match_sum = nan(1,total_trials);
@@ -104,12 +112,21 @@ for trial = 1:numel(dates)
         subj_percent_match(trial) = .05;
     end
         
+    game_length = observations.trial_length{trial};
+    for t = 1:game_length
+        % set reject/high offer/low offer probs depending on trial length
+        if  game_length == 8
+            p_high = p_high_vec_8_choice(t);
+            p_alone = p_alone_vec_8_choice(t);
+            p_low = p_low_vec_8_choice(t);
+        else
+            p_high = p_high_vec_4_choice(t);
+            p_alone = p_alone_vec_4_choice(t);
+            p_low = p_low_vec_4_choice(t);
+        end
 
-    
-    
-    for t = 1:T
-        if t ~=T
-            EV_wait(t) = .9*p_high_vec(t) + alone_acceptance*p_alone_vec(t) + subj_percent_match(trial)*p_low_vec(t);
+        if t ~=game_length
+            EV_wait(t) = .9*p_high + alone_acceptance*p_alone + subj_percent_match(trial)*p_low;
             EV_accept(t) = subj_percent_match(trial);
             p_accept(trial,t) = 1/(1+exp((EV_wait(t)-EV_accept(t))/decision_noise));
         else
@@ -139,7 +156,7 @@ action_probabilities = nan(8, total_trials);
 %action_probabilities = nan(1, total_trials);
 for trial = 1:total_trials
     game = actions.choice{trial};
-    observation = observations{trial};
+    observation = observations.obs{trial};
     T = length(game)-1; % number of decisions this person made
     % include all decisions up until last one (don't count decision to
     % accept high offer since it's automatic!
@@ -160,6 +177,8 @@ for trial = 1:total_trials
 end
 
 model_output.action_probabilities = action_probabilities;
+model_output.observations = observations;
+model_output.actions=actions;
 model_output.subj_date_qual = subj_percent_match;
 
 end

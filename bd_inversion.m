@@ -121,19 +121,7 @@ function L = spm_mdp_L(P,M,U,Y)
     end
 
 
-    % discern whether learning is enabled - and identify unique trials if not
-    %--------------------------------------------------------------------------
-%     if any(ismember(fieldnames(params),{'a','b','d','c','d','e'}))
-%         j = 1:numel(U);
-%         k = 1:numel(U);
-%     else
-%         % find unique trials (up until the last outcome)
-%         %----------------------------------------------------------------------
-%         u       = spm_cat(U');
-%         [i,j,k] = unique(u(:,1:(end - 1)),'rows');
-%     end
 
-    
     model_output = bd_model(params,U,Y);
     log_probs = log(model_output.action_probabilities);
     log_probs(isnan(log_probs)) = eps; % Replace NaN in log output with eps for summing

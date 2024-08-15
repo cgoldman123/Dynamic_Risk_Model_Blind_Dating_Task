@@ -53,7 +53,8 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 
     %1x108 struct: choice, observation, reaction time
 
-    df_struct = cell(1, 108);
+    df_struct = cell(1, trials);
+    game_length = nan(1,trials);
     for i = 0:trials
         %Extract the relevant rows from df for the current trial
         trial_data = subdat(subdat.trial == i, {'response','trial_type', 'result', 'response_time'});
@@ -73,6 +74,7 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 
         trial_type = trial_data.trial_type{1};
         split_str = strsplit(trial_type, '_');
+        
         high_offer_time = str2double(split_str{2})+1; % time high offer is given
         rejection_time = str2double(split_str{3}); % time rejection happens
         observation_array = nan(n, 1);
@@ -97,7 +99,8 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 %             df_struct{1,i+1}.state_array = state_array;
 %             df_struct{1,i+1} =  struct2table(df_struct{1,i+1});
 
-        DCM.U{1,i+1} = observation_array;
+        DCM.U.obs{1,i+1} = observation_array;
+        DCM.U.trial_length{1,i+1} = str2double(split_str{1});
         DCM.Y.choice{1,i+1} = state_array;
         DCM.Y.rts{1,i+1} = reaction_times;
 
@@ -125,6 +128,11 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     fit_results.has_practice_effects = has_practice_effects;
     % get final average action probability
     model_output = bd_model(params,DCM.U,DCM.Y);
+    
+    % plot fit
+    plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions)
+
+    
     fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
 
     % get final model accuracy
