@@ -78,7 +78,6 @@ pC      = spm_cat(pC);
 M.L     = @(P,M,U,Y)spm_mdp_L(P,M,U,Y);  % log-likelihood function
 M.pE    = pE;                            % prior means (parameters)
 M.pC    = pC;                            % prior variance (parameters)
-M.mdp   = DCM.MDP;                       % MDP structure
 M.params = DCM.params;                   % includes fixed and fitted params
 
 % Variational Laplace

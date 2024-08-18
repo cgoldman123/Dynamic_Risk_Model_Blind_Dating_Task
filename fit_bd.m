@@ -94,11 +94,6 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
         reaction_times = nan(n,1);
         reaction_times(2:end) = trial_data.response_time(~isnan(trial_data.response_time));
 
-%             df_struct{1,i+1}.reaction_times = reaction_times;
-%             df_struct{1,i+1}.observation_array = observation_array;
-%             df_struct{1,i+1}.state_array = state_array;
-%             df_struct{1,i+1} =  struct2table(df_struct{1,i+1});
-
         DCM.U.obs{1,i+1} = observation_array;
         DCM.U.trial_length{1,i+1} = str2double(split_str{1});
         DCM.Y.choice{1,i+1} = state_array;
@@ -106,7 +101,6 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 
     end
 
-    DCM.MDP = nan;
     % call the model inversion code
     fit_DCM = bd_inversion(DCM);
 

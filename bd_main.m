@@ -2,7 +2,8 @@ clear all;
 close all;
 rng(23);
 dbstop if error
-SIMFIT = false;
+FIT = true;
+SIM = false;
 
 if ispc
     root = 'L:';
@@ -29,17 +30,28 @@ DCM.params.date_num_thresh = 1; % bound 0 and 1
 DCM.params.date_qual_thresh = 1; % bound 0 and 1
 DCM.params.date_num_sensitivity = 0; % unbounded
 DCM.params.date_qual_sensitivity = 0; % unbounded
-DCM.params.alone_acceptance = 0; % unbounded
-DCM.params.decision_noise = 2; % bound positive
+DCM.params.alone_acceptance = 1; % unbounded
+DCM.params.decision_noise = 1; % bound positive
 DCM.params.initial_offer_scale = 1; % bound positive
-DCM.field = {'alone_acceptance', 'decision_noise', 'date_num_sensitivity',...
-     'date_qual_sensitivity', 'p_high_hazard', 'p_reject_ceiling_ratio' };
 DCM.field = {'alone_acceptance', 'decision_noise',...
      'initial_offer_scale', 'p_high_hazard', 'p_reject_start_ratio' };
+ 
+ 
+if FIT
+    [fit_results, fit_DCM, file] = fit_bd(subject, DCM);
+    mf_results = bd_model_free(file);
+    final_table = [struct2table(fit_results), struct2table(mf_results)];
+    if SIM
+        simfit_results = simfit_bd(fit_results, fit_DCM);
+        final_table = [final_table struct2table(simfit_results)];
+    end  
+else
+    if SIM
+        simmed_output = sim_bd(DCM.params);
+    end
+end
 
-[fit_results, fit_DCM, file] = fit_bd(subject, DCM);
-mf_results = bd_model_free(file);
-fit_results_table = [struct2table(fit_results), struct2table(mf_results)];
 
-writetable(fit_results_table, [result_dir subject '_blind_dating_fit.csv']);
+
+writetable(final_table, [result_dir subject '_blind_dating_fit.csv']);
 save([result_dir subject '_blind_dating_fit.mat'], 'fit_DCM');
