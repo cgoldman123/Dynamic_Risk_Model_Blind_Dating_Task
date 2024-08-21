@@ -58,7 +58,8 @@ for i = 1:length(DCM.field)
         pC{i,i}    = diag(param);
     else
         % transform the parameters that we fit
-        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio'})
+        if ismember(field, {'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio',...
+                'p_high_start', 'p_high_ceiling'})
             pE.(field) = log(DCM.params.(field)/(1-DCM.params.(field)));  % bound between 0 and 1
             pC{i,i}    = prior_variance;
         elseif ismember(field, {'decision_noise', 'initial_offer_scale'})
@@ -110,7 +111,8 @@ function L = spm_mdp_L(P,M,U,Y)
     params   = M.params; % includes fitted and fixed params. Write over fitted params below. 
     field = fieldnames(M.pE);
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio'})
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh','p_reject_ratio',...
+                'p_high_start', 'p_high_ceiling'})
             params.(field{i}) = 1/(1+exp(-P.(field{i})));
         elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(P.(field{i}));
@@ -121,7 +123,7 @@ function L = spm_mdp_L(P,M,U,Y)
 
 
 
-    model_output = bd_model(params,U,Y);
+    model_output = bd_model_v2(params,U,Y);
     log_probs = log(model_output.action_probabilities);
     log_probs(isnan(log_probs)) = eps; % Replace NaN in log output with eps for summing
     L = sum(log_probs, 'all');

@@ -1,4 +1,4 @@
-function plot_bd(action_probabilities, observations, actions)
+function plot_bd(action_probabilities, observations, actions, risk)
 
 figure;
 hold on;
@@ -97,6 +97,20 @@ title('Action Probabilities and Decisions per Game');
 set(gca, 'YTick', []);
 set(gca, 'YTickLabel', []);
 
-hold off;
+
+
+figure;
+hold on;
+
+% Add markers for each line using the appropriate marker symbols
+plot(risk.p_high, '-og', 'MarkerFaceColor', 'g');  % Circle markers for high offer, filled with green
+plot(risk.p_alone, '-ob', 'MarkerFaceColor', 'b');  % Circle markers for rejected, filled with blue
+plot(risk.p_low, '-ok', 'MarkerFaceColor', 'k');   % Circle markers for low offer, filled with black
+
+legend('High Offer', 'Rejected', 'Low Offer');
+xlabel('Choice Number');
+ylabel('Probability');
+title('Probabilities for T=8');
+
 
 end

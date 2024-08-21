@@ -34,4 +34,4 @@ for subject in subjects:
     
 
 
-###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_fit_no_concern_stagnant_risk_8-8-24/
+###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_fit_v2_8-21-24/

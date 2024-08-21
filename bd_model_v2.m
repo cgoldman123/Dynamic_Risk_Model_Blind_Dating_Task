@@ -1,4 +1,4 @@
-function [model_output] = bd_model(params, observations, actions)
+function [model_output] = bd_model_v2(params, observations, actions)
 dbstop if error
 % use helper function to load in variable names
 get_params(params);
@@ -33,12 +33,14 @@ for t = 1:T
     p_low_vec_8_choice(t) = 1 - p_high_vec_8_choice(t) - p_alone_vec_8_choice(t);
 end
 
-
 % stagnant risk
-% p_high_vec = repmat(p_high_hazard, 1, T);
+% p_high_vec_8_choice = repmat(p_high_hazard, 1, 8);
+% p_high_vec_4_choice = repmat(p_high_hazard, 1, 4);
 % p_reject = (1-p_high_hazard)*p_reject_ratio;
-% p_alone_vec = repmat(p_reject, 1, T);
-% p_low_vec = repmat(1-p_high_hazard-p_reject, 1, T);
+% p_alone_vec_8_choice = repmat(p_reject, 1, 8);
+% p_alone_vec_4_choice = repmat(p_reject, 1, 4);
+% p_low_vec_8_choice = repmat(1-p_high_hazard-p_reject, 1, 8);
+% p_low_vec_4_choice = repmat(1-p_high_hazard-p_reject, 1, 4);
 
 
 %  plot([p_high_vec]') % probability that person will get the high offer
@@ -64,27 +66,18 @@ for trial = 1:total_trials
     % get initial offer
     initial_offer(trial) = observations.obs{trial}(1)/100;
     
-    trials_left = total_trials-trial+1; % trials left including this one
-
-    % get concern for number of dates
-    max_possible_dates = trials_left + num_dates_scheduled(trial);
-    max_possible_dates_percent = max_possible_dates/total_trials;
-    date_num_concern = date_num_thresh - max_possible_dates_percent;
     
-    % get concern for quality of dates
-    date_qual_concern = date_qual_thresh - average_percent_match(trial);
-
     % get subjective value of initial offer
-    subj_percent_match(trial) = initial_offer_scale*initial_offer(trial) + date_num_sensitivity*date_num_concern - date_qual_sensitivity*date_qual_concern;
-   
-    % make sure initial offer is never subjectively better than high offer
+    %subj_percent_match(trial) = date_qual_sensitivity*(initial_offer(trial) - average_percent_match(trial))+average_percent_match(trial);
+    subj_percent_match(trial) = initial_offer_scale*initial_offer(trial) ;
+    
+   % make sure initial offer is never subjectively better than high offer
     if subj_percent_match(trial) > .85
         subj_percent_match(trial) = .85;
     elseif subj_percent_match(trial) < .05
         subj_percent_match(trial) = .05;
     end
     
-    % set probability of reject/high offer/low offer probs depending on trial length
     game_length = observations.trial_length{trial};
     % for each time step in a game
     for t = 1:game_length
@@ -201,10 +194,10 @@ model_output.action_probabilities = action_probabilities;
 model_output.observations = observations;
 model_output.actions=actions;
 model_output.subj_date_qual = subj_percent_match;
+
 model_output.risk.p_high = p_high_vec_8_choice;
 model_output.risk.p_alone = p_alone_vec_8_choice;
 model_output.risk.p_low = p_low_vec_8_choice;
-
 
 
 end

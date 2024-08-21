@@ -109,7 +109,8 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     % get fitted and fixed params
     params = fit_DCM.params;
     for i = 1:length(field)
-        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh', 'p_reject_ratio'})
+        if ismember(field{i},{'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio', 'date_qual_thresh','date_num_thresh', 'p_reject_ratio',...
+                'p_high_start', 'p_high_ceiling'})
             params.(field{i}) = 1/(1+exp(-fit_DCM.Ep.(field{i})));
         elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(fit_DCM.Ep.(field{i}));
@@ -120,11 +121,13 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     
     fit_results.subject = subject;
     fit_results.has_practice_effects = has_practice_effects;
+    fit_results.F = fit_DCM.F;
+    
     % get final average action probability
-    model_output = bd_model(params,DCM.U,DCM.Y);
+    model_output = bd_model_v2(params,DCM.U,DCM.Y);
     
     % plot fit
-    plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions)
+    plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions, model_output.risk);
 
     
     fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
