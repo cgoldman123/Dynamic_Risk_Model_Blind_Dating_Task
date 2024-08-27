@@ -136,7 +136,7 @@ for trial = 1:total_trials
             
         end
     end
-    % fitting actual data
+    
     if actions.choice{trial}(end) == 1 % no date
         dates(trial) = 0;
         percent_match(trial) = 0;

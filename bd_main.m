@@ -3,7 +3,7 @@ close all;
 rng(23);
 dbstop if error
 FIT = true;
-SIM = false;
+SIM = true;
 
 if ispc
     root = 'L:';
@@ -21,18 +21,18 @@ addpath([root '/rsmith/all-studies/util/spm12/toolbox/DEM/']);
 % specify fitted and fixed parameter values; note that fieldnames
 % determines which parameters are fitted
 DCM.params.p_high_hazard = .25; % bound 0 and 1
-% DCM.params.p_high_start = .25; % bound 0 and 1
-% DCM.params.p_high_ceiling = .25; % bound 0 and 1
+DCM.params.p_high_start = .25; % bound 0 and 1
+DCM.params.p_high_ceiling = .25; % bound 0 and 1
 
 % dynamic risk
 DCM.params.p_reject_start_ratio = .33; % bound 0 and 1
 DCM.params.p_reject_ceiling_ratio = .8; % bound 0 and 1
 % stagnant risk
-%DCM.params.p_reject_ratio = .33;
-% DCM.params.date_num_thresh = 1; % bound 0 and 1
-% DCM.params.date_qual_thresh = 1; % bound 0 and 1
-%DCM.params.date_num_sensitivity = 0; % unbounded
-%DCM.params.date_qual_sensitivity = 1; % unbounded
+DCM.params.p_reject_ratio = .33;
+DCM.params.date_num_thresh = 1; % bound 0 and 1
+DCM.params.date_qual_thresh = 1; % bound 0 and 1
+DCM.params.date_num_sensitivity = 0; % unbounded
+DCM.params.date_qual_sensitivity = 1; % unbounded
 DCM.params.alone_acceptance = 1; % unbounded
 DCM.params.decision_noise = 1; % bound positive
 DCM.params.initial_offer_scale = 1; % bound positive
@@ -49,7 +49,7 @@ if FIT
     end  
 else
     if SIM
-        simmed_output = sim_bd(DCM.params);
+        simmed_output = sim_bd(DCM.params,1);
     end
 end
 

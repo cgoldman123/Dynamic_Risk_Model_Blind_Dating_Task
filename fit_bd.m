@@ -114,8 +114,11 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
             params.(field{i}) = 1/(1+exp(-fit_DCM.Ep.(field{i})));
         elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(fit_DCM.Ep.(field{i}));
-        else
+        elseif ismember(field{i},{'alone_acceptance', 'date_num_sensitivity','date_qual_sensitivity'})
             params.(field{i}) = fit_DCM.Ep.(field{i});
+        else
+            disp(field{i});
+            error("Param not propertly transformed");
         end
     end
     
@@ -124,7 +127,7 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
     fit_results.F = fit_DCM.F;
     
     % get final average action probability
-    model_output = bd_model_v2(params,DCM.U,DCM.Y);
+    model_output = bd_model(params,DCM.U,DCM.Y);
     
     % plot fit
     plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions, model_output.risk);

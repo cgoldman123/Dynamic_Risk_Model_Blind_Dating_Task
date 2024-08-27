@@ -1,4 +1,4 @@
-function simmed_output = sim_bd(params)
+function simmed_output = sim_bd(params,plot)
 
 file = 'L:/NPC/DataSink/StimTool_Online/WB_Blind_Dating/blind_dating_5c4ea6cc889752000156dd8e_T1_2024-05-08_12h52.43.170.csv';
 
@@ -36,7 +36,8 @@ actions = {};
 
 simmed_output = bd_model(params,observations, actions);
 
-plot_bd(simmed_output.action_probabilities, simmed_output.observations, simmed_output.actions)
-
+if plot
+    plot_bd(simmed_output.action_probabilities, simmed_output.observations, simmed_output.actions)
+end
 
 end

@@ -65,9 +65,12 @@ for i = 1:length(DCM.field)
         elseif ismember(field, {'decision_noise', 'initial_offer_scale'})
             pE.(field) = log(DCM.params.(field));               % in log-space (to keep positive)
             pC{i,i}    = prior_variance;  
-        else
+        elseif ismember(field,{'alone_acceptance', 'date_num_sensitivity','date_qual_sensitivity'})
             pE.(field) = DCM.params.(field); 
             pC{i,i}    = prior_variance;
+        else
+            disp(field);
+            error("Param not properly transformed");
         end
     end
 end
@@ -123,7 +126,7 @@ function L = spm_mdp_L(P,M,U,Y)
 
 
 
-    model_output = bd_model_v2(params,U,Y);
+    model_output = bd_model(params,U,Y);
     log_probs = log(model_output.action_probabilities);
     log_probs(isnan(log_probs)) = eps; % Replace NaN in log output with eps for summing
     L = sum(log_probs, 'all');

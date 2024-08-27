@@ -10,7 +10,7 @@ function simfit_results = simfit_bd(fit_results, fit_DCM)
             params.(param_name) = fit_results.(field_names{i});
         end
     end
-    simmed_output = sim_bd(params);
+    simmed_output = sim_bd(params,0);
     
     % fit simulated behavior
     simmed_DCM.field = fit_DCM.field; 
@@ -30,8 +30,11 @@ function simfit_results = simfit_bd(fit_results, fit_DCM)
             params.(field{i}) = 1/(1+exp(-simfit_DCM.Ep.(field{i})));
         elseif ismember(field{i},{'decision_noise', 'initial_offer_scale'})
             params.(field{i}) = exp(simfit_DCM.Ep.(field{i}));
-        else
+        elseif ismember(field{i},{'alone_acceptance', 'date_num_sensitivity','date_qual_sensitivity'})
             params.(field{i}) = simfit_DCM.Ep.(field{i});
+        else
+            disp(field{i});
+            error("Should have transformed a parameter or indicated that don't need to transform");
         end
     end
     
