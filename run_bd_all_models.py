@@ -1,0 +1,65 @@
+import sys, os, re, subprocess
+
+subject_list_path = '/media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/blind_dating_subject_IDs_prolific.csv'
+results = sys.argv[1]
+# experiment_mode = sys.argv[2] # indicate inperson, mturk, or prolific
+
+models = [
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_num_thresh,decision_noise,alone_acceptance', 'dynamic_risk':1},
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_qual_thresh,decision_noise,alone_acceptance', 'dynamic_risk':1},
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_num_thresh,date_qual_thresh,decision_noise,alone_acceptance', 'dynamic_risk':1},
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_num_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':1}, # winner
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_qual_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':1},
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_num_sensitivity,date_qual_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':1}, #second
+    {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,decision_noise,alone_acceptance', 'dynamic_risk':1},
+
+    {'field': 'p_high_hazard,p_reject_ratio,date_num_thresh,decision_noise,alone_acceptance', 'dynamic_risk':0},
+    {'field': 'p_high_hazard,p_reject_ratio,date_qual_thresh,decision_noise,alone_acceptance', 'dynamic_risk':0},
+    {'field': 'p_high_hazard,p_reject_ratio,date_num_thresh,date_qual_thresh,decision_noise,alone_acceptance', 'dynamic_risk':0},
+    {'field': 'p_high_hazard,p_reject_ratio,date_num_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':0}, # third best
+    {'field': 'p_high_hazard,p_reject_ratio,date_qual_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':0},
+    {'field': 'p_high_hazard,p_reject_ratio,date_num_sensitivity,date_qual_sensitivity,decision_noise,alone_acceptance', 'dynamic_risk':0},
+    {'field': 'p_high_hazard,p_reject_ratio,decision_noise,alone_acceptance', 'dynamic_risk':0},
+
+]
+
+
+
+if not os.path.exists(results):
+    os.makedirs(results)
+    print(f"Created results directory {results}")
+
+
+subjects = []
+with open(subject_list_path) as infile:
+    next(infile)  # Skip the header line
+    for line in infile:
+        subjects.append(line.strip())
+
+ssub_path = '/media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.ssub'
+
+    
+for index, model in enumerate(models, start=1):
+    combined_results_dir = os.path.join(results, f"model{index}")
+    field = model['field']
+    dynamic_risk = model['dynamic_risk']
+
+    if not os.path.exists(f"{combined_results_dir}/logs"):
+        os.makedirs(f"{combined_results_dir}/logs")
+        print(f"Created results-logs directory {combined_results_dir}/logs")
+    
+    for subject in subjects:
+        stdout_name = f"{combined_results_dir}/logs/BD-{subject}-%J.stdout"
+        stderr_name = f"{combined_results_dir}/logs/BD-{subject}-%J.stderr"
+    
+        jobname = f'BD-Model-{index}-fit-{subject}'
+        os.system(f"sbatch -J {jobname} -o {stdout_name} -e {stderr_name} {ssub_path} \"{subject}\" \"{combined_results_dir}\" \"{field}\" \"{dynamic_risk}\"")
+    
+        print(f"SUBMITTED JOB [{jobname}]")
+        
+     
+    
+    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/
+
+    ## joblist | grep BD | grep -Po 98.... | xargs -n1 scancel
+    

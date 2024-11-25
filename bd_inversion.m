@@ -62,6 +62,7 @@ for i = 1:length(DCM.field)
                 'p_high_start', 'p_high_ceiling'})
             pE.(field) = log(DCM.params.(field)/(1-DCM.params.(field)));  % bound between 0 and 1
             pC{i,i}    = prior_variance;
+ %           pC{i,i}    = 4;
         elseif ismember(field, {'decision_noise', 'initial_offer_scale'})
             pE.(field) = log(DCM.params.(field));               % in log-space (to keep positive)
             pC{i,i}    = prior_variance;  

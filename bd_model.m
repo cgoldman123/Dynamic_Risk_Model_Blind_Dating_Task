@@ -17,28 +17,32 @@ end
 
 
 %setup dynamic risk
-p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
-p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
+if dynamic_risk
+    p_reject_start = p_reject_start_ratio * (1 - p_high_hazard);
+    p_reject_ceiling = p_reject_ceiling_ratio * (1 - p_high_hazard - p_reject_start);
 
-T=4;
-for t = 1:T
-    p_high_vec_4_choice(t) = p_high_hazard;
-    p_alone_vec_4_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
-    p_low_vec_4_choice(t) = 1 - p_high_vec_4_choice(t) - p_alone_vec_4_choice(t);
-end
-T=8; % choice number within each game
-for t = 1:T
-    p_high_vec_8_choice(t) = p_high_hazard;
-    p_alone_vec_8_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
-    p_low_vec_8_choice(t) = 1 - p_high_vec_8_choice(t) - p_alone_vec_8_choice(t);
-end
-
-
+    T=4;
+    for t = 1:T
+        p_high_vec_4_choice(t) = p_high_hazard;
+        p_alone_vec_4_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
+        p_low_vec_4_choice(t) = 1 - p_high_vec_4_choice(t) - p_alone_vec_4_choice(t);
+    end
+    T=8; % choice number within each game
+    for t = 1:T
+        p_high_vec_8_choice(t) = p_high_hazard;
+        p_alone_vec_8_choice(t) = p_reject_start + (p_reject_ceiling - p_reject_start)*(log(t)/log(T));
+        p_low_vec_8_choice(t) = 1 - p_high_vec_8_choice(t) - p_alone_vec_8_choice(t);
+    end
+else
 % stagnant risk
-% p_high_vec = repmat(p_high_hazard, 1, T);
-% p_reject = (1-p_high_hazard)*p_reject_ratio;
-% p_alone_vec = repmat(p_reject, 1, T);
-% p_low_vec = repmat(1-p_high_hazard-p_reject, 1, T);
+    p_high_vec_8_choice = repmat(p_high_hazard, 1, 8);
+    p_high_vec_4_choice = repmat(p_high_hazard, 1, 4);
+    p_reject = (1-p_high_hazard)*p_reject_ratio;
+    p_alone_vec_8_choice = repmat(p_reject, 1, 8);
+    p_alone_vec_4_choice = repmat(p_reject, 1, 4);
+    p_low_vec_8_choice = repmat(1-p_high_hazard-p_reject, 1, 8);
+    p_low_vec_4_choice = repmat(1-p_high_hazard-p_reject, 1, 4);
+end
 
 
 %  plot([p_high_vec]') % probability that person will get the high offer
@@ -78,12 +82,13 @@ for trial = 1:total_trials
     subj_percent_match(trial) = initial_offer_scale*initial_offer(trial) + date_num_sensitivity*date_num_concern - date_qual_sensitivity*date_qual_concern;
    
     % make sure initial offer is never subjectively better than high offer
-    if subj_percent_match(trial) > .85
-        subj_percent_match(trial) = .85;
-    elseif subj_percent_match(trial) < .05
-        subj_percent_match(trial) = .05;
+    if subj_percent_match(trial) >= .9
+        subj_percent_match(trial) = .9-eps;
     end
-    
+%     elseif subj_percent_match(trial) < .05
+%        % subj_percent_match(trial) = .05;
+%     end
+%     
     % set probability of reject/high offer/low offer probs depending on trial length
     game_length = observations.trial_length{trial};
     % for each time step in a game

@@ -1,6 +1,11 @@
 function simmed_output = sim_bd(params,plot)
 
-file = 'L:/NPC/DataSink/StimTool_Online/WB_Blind_Dating/blind_dating_5c4ea6cc889752000156dd8e_T1_2024-05-08_12h52.43.170.csv';
+% read in random file to get initial offer sequence
+if ispc
+    file = 'L:/NPC/DataSink/StimTool_Online/WB_Blind_Dating/blind_dating_5c4ea6cc889752000156dd8e_T1_2024-05-08_12h52.43.170.csv';
+else
+    file = '/media/labs/NPC/DataSink/StimTool_Online/WB_Blind_Dating/blind_dating_5c4ea6cc889752000156dd8e_T1_2024-05-08_12h52.43.170.csv';
+end
 
 subdat = readtable(file);
 
