@@ -1,4 +1,4 @@
-function simfit_results = simfit_bd(fit_results, fit_DCM)
+function simfit_results = simfit_bd(fit_results, fit_DCM, study)
     % simulate behavior
     params = fit_DCM.params;
     field_names = fieldnames(fit_results); % Get the fieldnames once
@@ -10,7 +10,7 @@ function simfit_results = simfit_bd(fit_results, fit_DCM)
             params.(param_name) = fit_results.(field_names{i});
         end
     end
-    simmed_output = sim_bd(params,0);
+    simmed_output = sim_bd(params,study,0);
     
     % fit simulated behavior
     simmed_DCM.field = fit_DCM.field; 

@@ -1,4 +1,6 @@
-function mf_results = bd_model_free(file)
+function mf_results = bd_model_free_prolific(file)
+    % file = 'L:/NPC/DataSink/StimTool_Online/WB_Blind_Dating/blind_dating_5c3c1617f5ebd500018596cb_T1_2024-06-09_15h34.23.944.csv'
+
     subdat = readtable(file);
     
         
@@ -9,11 +11,7 @@ function mf_results = bd_model_free(file)
     subdat = subdat(main_row_idx+1:end, :);
 
 
-%     observations.obs = cell(1,108);
-%     observations.obs = cell(1,108);
-% 
-%     actions = cell(1,108);
-%     rts = cell(1,108);
+
     trials = 107;
     for i = 0:trials
         %Extract the relevant rows from df for the current trial

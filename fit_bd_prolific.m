@@ -1,4 +1,4 @@
-function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
+function [fit_results, fit_DCM, file] = fit_bd_prolific(subject,DCM)
     dbstop if error;
     if ispc
         root = 'L:/';
@@ -51,10 +51,6 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
         error("This subject does not have a complete behavioral file");
     end
 
-    %1x108 struct: choice, observation, reaction time
-
-    df_struct = cell(1, trials);
-    game_length = nan(1,trials);
     for i = 0:trials
         %Extract the relevant rows from df for the current trial
         trial_data = subdat(subdat.trial == i, {'response','trial_type', 'result', 'response_time'});
@@ -74,7 +70,7 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
 
         trial_type = trial_data.trial_type{1};
         split_str = strsplit(trial_type, '_');
-        
+        % note that everything is shifted from local
         high_offer_time = str2double(split_str{2})+1; % time high offer is given
         rejection_time = str2double(split_str{3}); % time rejection happens
         observation_array = nan(n, 1);
@@ -83,11 +79,11 @@ function [fit_results, fit_DCM, file] = fit_bd(subject,DCM)
          if high_offer_time == n % if got high offer
             observation_array(length(observation_array)) = 90;
          elseif any(state_array(end) == 2) % if accepted initial offer
-                    observation_array(length(observation_array)) = observation_array(1);
+             observation_array(length(observation_array)) = observation_array(1);
          elseif rejection_time == n % if got rejected
-                    observation_array(length(observation_array)) = 0;
+             observation_array(length(observation_array)) = 0;
          else  %if rejected the initial offer
-                    observation_array(length(observation_array)) = 0;
+             observation_array(length(observation_array)) = 0;
          end
 
         % reaction time

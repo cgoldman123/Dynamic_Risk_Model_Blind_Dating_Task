@@ -7,9 +7,13 @@ SIM = true;
 
 if ispc
     root = 'L:';
-    subject = '5c3c1617f5ebd500018596cb'; % 5c4ea6cc889752000156dd8e 5590a34cfdf99b729d4f69dc 66368ac547b8824e50cfa854 5fadd628cd4e9e1c42dab969 5fc58cd91b53521031a2d369 5fd5381b5807b616d910c586
+    study = 'local'; % indicate if study is prolific or local
+    if strcmp(study,'local')
+        subject = 'BW226';
+    else
+        subject = 'TYLER_TEST'; % 5c4ea6cc889752000156dd8e 5590a34cfdf99b729d4f69dc 66368ac547b8824e50cfa854 5fadd628cd4e9e1c42dab969 5fc58cd91b53521031a2d369 5fd5381b5807b616d910c586
+    end
     result_dir = 'L:/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/';
-    
     % specify fitted and fixed parameter values; note that fieldnames
     % determines which parameters are fitted
     DCM.field = {'decision_noise', 'alone_acceptance', 'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio'};
@@ -76,11 +80,16 @@ DCM.params.initial_offer_scale = 1; % bound positive
  
  
 if FIT
-    [fit_results, fit_DCM, file] = fit_bd(subject, DCM);
-    mf_results = bd_model_free(file);
+    if strcmp(study,"prolific")
+        [fit_results, fit_DCM, file] = fit_bd_prolific(subject, DCM);
+        mf_results = bd_model_free_prolific(file);
+    elseif strcmp(study,"local")
+        [fit_results, fit_DCM, file] = fit_bd_local(subject, DCM);
+        mf_results = bd_model_free_local(file);
+    end
     final_table = [struct2table(fit_results), struct2table(mf_results)];
     if SIM
-        simfit_results = simfit_bd(fit_results, fit_DCM);
+        simfit_results = simfit_bd(fit_results, fit_DCM,study);
         final_table = [final_table struct2table(simfit_results)];
     end  
 else
