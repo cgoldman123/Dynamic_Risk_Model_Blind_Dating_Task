@@ -1,8 +1,14 @@
 import sys, os, re, subprocess
 
-subject_list_path = '/media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/blind_dating_subject_IDs_prolific.csv'
 results = sys.argv[1]
-# experiment_mode = sys.argv[2] # indicate inperson, mturk, or prolific
+study = sys.argv[2] # indicate "local" or "prolific"
+
+if study == "prolific":
+    subject_list_path = '/media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/blind_dating_subject_IDs_prolific.csv'
+
+if study == "local":
+    subject_list_path = "TODO"
+
 
 models = [
     {'field': 'p_high_hazard,p_reject_start_ratio,p_reject_ceiling_ratio,date_num_thresh,decision_noise,alone_acceptance', 'dynamic_risk':1},
@@ -49,17 +55,18 @@ for index, model in enumerate(models, start=1):
         print(f"Created results-logs directory {combined_results_dir}/logs")
     
     for subject in subjects:
+        
         stdout_name = f"{combined_results_dir}/logs/BD-{subject}-%J.stdout"
         stderr_name = f"{combined_results_dir}/logs/BD-{subject}-%J.stderr"
     
         jobname = f'BD-Model-{index}-fit-{subject}'
-        os.system(f"sbatch -J {jobname} -o {stdout_name} -e {stderr_name} {ssub_path} \"{subject}\" \"{combined_results_dir}\" \"{field}\" \"{dynamic_risk}\"")
+        os.system(f"sbatch -J {jobname} -o {stdout_name} -e {stderr_name} {ssub_path} \"{subject}\" \"{combined_results_dir}\" \"{field}\" \"{dynamic_risk}\" \"{study}\"")
     
         print(f"SUBMITTED JOB [{jobname}]")
         
      
     
-    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/
+    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/ "prolific"
 
     ## joblist | grep BD | grep -Po 98.... | xargs -n1 scancel
     

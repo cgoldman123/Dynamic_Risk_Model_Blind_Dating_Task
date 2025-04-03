@@ -19,6 +19,7 @@ if ispc
     DCM.field = {'decision_noise', 'alone_acceptance', 'p_high_hazard', 'p_reject_start_ratio', 'p_reject_ceiling_ratio'};
     DCM.params.dynamic_risk = 1;
 else
+    study = getenv('STUDY')
     root = '/media/labs';
     subject = getenv('SUBJECT')
     result_dir = getenv('RESULTS')

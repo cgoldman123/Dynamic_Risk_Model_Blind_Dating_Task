@@ -21,6 +21,9 @@ export FIELD
 DYNAMIC_RISK=$4
 export DYNAMIC_RISK
 
+STUDY=$5
+export STUDY
+
 
 
 module load matlab/2022a
