@@ -86,7 +86,7 @@ actions = {};
 simmed_output = bd_model(params,observations, actions);
 
 if plot
-    plot_bd(simmed_output.action_probabilities, simmed_output.observations, simmed_output.actions)
+    plot_bd(simmed_output.action_probabilities, simmed_output.observations, simmed_output.actions,simmed_output.risk)
 end
 
 end

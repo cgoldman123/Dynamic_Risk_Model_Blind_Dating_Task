@@ -2,7 +2,7 @@ clear all;
 close all;
 rng(23);
 dbstop if error
-FIT = true;
+FIT = false;
 SIM = true;
 
 if ispc
@@ -95,7 +95,7 @@ if FIT
     end  
 else
     if SIM
-        simmed_output = sim_bd(DCM.params,1);
+        simmed_output = sim_bd(DCM.params,"prolific",1);
     end
 end
 
