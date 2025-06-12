@@ -2,12 +2,12 @@ clear all;
 close all;
 rng(23);
 dbstop if error
-FIT = false;
+FIT = true;
 SIM = true;
 
 if ispc
     root = 'L:';
-    study = 'local'; % indicate if study is prolific or local
+    study = 'prolific'; % indicate if study is prolific or local
     if strcmp(study,'local')
         subject = 'BW226';
     else
@@ -93,6 +93,10 @@ if FIT
         simfit_results = simfit_bd(fit_results, fit_DCM,study);
         final_table = [final_table struct2table(simfit_results)];
     end  
+
+    writetable(final_table, [result_dir '/' subject '_blind_dating_fit.csv']);
+    save([result_dir '/' subject '_blind_dating_fit.mat'], 'fit_DCM');
+    saveas(gcf, [result_dir '/' subject '_blind_dating_plot.png']);
 else
     if SIM
         simmed_output = sim_bd(DCM.params,"prolific",1);
@@ -101,6 +105,3 @@ end
 
 
 
-writetable(final_table, [result_dir '/' subject '_blind_dating_fit.csv']);
-save([result_dir '/' subject '_blind_dating_fit.mat'], 'fit_DCM');
-saveas(gcf, [result_dir '/' subject '_blind_dating_plot.png']);

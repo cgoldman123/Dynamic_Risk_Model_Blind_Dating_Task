@@ -67,6 +67,9 @@ for index, model in enumerate(models, start=1):
      
     
     ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/ "prolific"
+    
+    TODO ORESTES change to save to ORESTES SUB FOLDER
+    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/ "prolific"
 
     ## joblist | grep BD | grep -Po 98.... | xargs -n1 scancel
     

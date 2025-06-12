@@ -45,11 +45,11 @@ else
 end
 
 
-%  plot([p_high_vec]') % probability that person will get the high offer
-%  hold on
-%  plot([p_alone_vec]') % probability that person will get rejected
-%  hold on
-%  plot([p_low_vec]') % probability that low offer will still be there
+ % plot([p_high_vec_8_choice]') % probability that person will get the high offer
+ % hold on
+ % plot([p_alone_vec_8_choice]') % probability that person will get rejected
+ % hold on
+ % plot([p_low_vec_8_choice]') % probability that low offer will still be there
 
 %% dynamic preference component & choice 
 
