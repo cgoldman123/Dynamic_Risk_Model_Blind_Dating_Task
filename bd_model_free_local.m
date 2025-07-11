@@ -54,8 +54,16 @@ function mf_results = bd_model_free_local(file)
         trial_type = trial_data.trial_type{1};
         split_str = strsplit(trial_type, '_');
         
-        high_offer_time = str2double(split_str{2})+2; % time high offer is given
-        rejection_time = str2double(split_str{3})+1; % time rejection happens
+        if split_str{2} == '0'
+            high_offer_time = 0;
+        else
+            high_offer_time = str2double(split_str{2})+2; % time high offer is given
+        end
+        if split_str{3} == '0'
+            rejection_time = 0;
+        else
+            rejection_time = str2double(split_str{3})+1; % time rejection happens
+        end
         observation_array = nan(n, 1);
         observation_array(1) = schedule.initial_offer(i);
 

@@ -88,9 +88,17 @@ function [fit_results, fit_DCM, file] = fit_bd_local(subject,DCM)
         trial_type = trial_data.trial_type{1};
         split_str = strsplit(trial_type, '_');
         % note that everything is shifted from prolific
-
-        high_offer_time = str2double(split_str{2})+2; % time high offer is given
-        rejection_time = str2double(split_str{3})+1; % time rejection happens
+        
+        if split_str{2} == '0'
+            high_offer_time = 0; % check for the pressence of high offer in the trial 
+        else
+            high_offer_time = str2double(split_str{2})+2; % time high offer is given
+        end
+        if split_str{3} == '0'
+            rejection_time = 0;
+        else
+            rejection_time = str2double(split_str{3})+1; % time rejection happens
+        end
         observation_array = nan(n, 1);
         observation_array(1) = schedule.initial_offer(i);
 
@@ -147,8 +155,8 @@ function [fit_results, fit_DCM, file] = fit_bd_local(subject,DCM)
     plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions, model_output.risk);
 
     
-    fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
-
+    %fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
+    fit_results.average_action_prob = mean(model_output.action_probabilities(:), 'omitnan');
     % get final model accuracy
     fit_results.model_acc = sum(model_output.action_probabilities(:)' > .5) / sum(~isnan(model_output.action_probabilities(:)'));
     
@@ -162,7 +170,6 @@ function [fit_results, fit_DCM, file] = fit_bd_local(subject,DCM)
         % param was fixed
         else
             fit_results.(['fixed_' param_names{i}]) = params.(param_names{i});
-    
         end
     end
 

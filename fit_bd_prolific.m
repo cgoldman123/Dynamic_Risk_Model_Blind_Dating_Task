@@ -129,7 +129,7 @@ function [fit_results, fit_DCM, file] = fit_bd_prolific(subject,DCM)
     plot_bd(model_output.action_probabilities, model_output.observations, model_output.actions, model_output.risk);
 
     
-    fit_results.average_action_prob = nanmean(model_output.action_probabilities, 'all');
+    fit_results.average_action_prob = mean(model_output.action_probabilities(:), 'omitnan');
 
     % get final model accuracy
     fit_results.model_acc = sum(model_output.action_probabilities(:)' > .5) / sum(~isnan(model_output.action_probabilities(:)'));
