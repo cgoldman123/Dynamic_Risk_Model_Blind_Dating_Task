@@ -87,7 +87,7 @@ for game = 1:108
 end
 
 % Adjust the axes and labels
-xlim([0.5, 108.5]);
+xlim([0.5, 130]);
 ylim([-.75, 10]); % Extend the y-limits to accommodate the staggered initial offer annotations
 xlabel('Game Number');
 ylabel('Choices');
@@ -97,7 +97,14 @@ title('Action Probabilities and Decisions per Game');
 set(gca, 'YTick', []);
 set(gca, 'YTickLabel', []);
 
+hold on;
+dummy_accept_high = patch(NaN, NaN, [0, 0.5, 0]);  % Green (Accept High Offer)
+dummy_reject = patch(NaN, NaN, [1, 0, 0]);         % Red (Reject)
+dummy_accept_initial = patch(NaN, NaN, [0, 0, 0]); % Black (Accept Initial Offer)
 
+legend([dummy_accept_high, dummy_reject, dummy_accept_initial], ...
+       {'Accepted High Offer', 'Rejected', 'Accepted Initial Offer'}, ...
+       'Location', 'northeast');  % Inside the plot
 
 figure;
 hold on;

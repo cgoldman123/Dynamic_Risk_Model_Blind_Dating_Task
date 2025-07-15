@@ -41,7 +41,7 @@ function simfit_results = simfit_bd(fit_results, fit_DCM, study)
     % get final average action probability
     model_output = bd_model(params,simmed_DCM.U,simmed_DCM.Y);
     
-    simfit_results.simfit_average_action_prob = nanmean(model_output.action_probabilities, 'all');
+    simfit_results.simfit_average_action_prob = mean(model_output.action_probabilities(:), 'omitnan');
 
     % get final model accuracy
     simfit_results.simfit_model_acc = sum(model_output.action_probabilities(:)' > .5) / sum(~isnan(model_output.action_probabilities(:)'));

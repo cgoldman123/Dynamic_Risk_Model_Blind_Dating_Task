@@ -7,7 +7,7 @@ if study == "prolific":
     subject_list_path = '/media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/blind_dating_subject_IDs_prolific.csv'
 
 if study == "local":
-    subject_list_path = "TODO"
+    subject_list_path = '/media/labs/rsmith/lab-members/osanchez/wellbeing/blind_dating/blind_dating_subject_IDs_local.csv'
 
 
 models = [
@@ -65,11 +65,9 @@ for index, model in enumerate(models, start=1):
         print(f"SUBMITTED JOB [{jobname}]")
         
      
-    
-    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/ "prolific"
-    
-    TODO ORESTES change to save to ORESTES SUB FOLDER
-    ###python3 /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/scripts/run_bd_all_models.py /media/labs/rsmith/lab-members/cgoldman/Wellbeing/blind_dating/model_output/prolific_model_output/BD_prolific_all_models/ "prolific"
+        
+    ### ORESTES change to save to ORESTES SUB FOLDER
+    ###python3 /media/labs/rsmith/lab-members/osanchez/wellbeing/blind_dating/Dynamic_Risk_Model_Blind_Dating_Task/run_bd_all_models.py /media/labs/rsmith/lab-members/osanchez/wellbeing/blind_dating/model_output/Local_fit_7-3-2025 "local"
 
     ## joblist | grep BD | grep -Po 98.... | xargs -n1 scancel
     

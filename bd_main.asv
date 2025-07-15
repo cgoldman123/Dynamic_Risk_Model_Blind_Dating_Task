@@ -7,12 +7,11 @@ SIM = true;
 
 if ispc
     root = 'L:';
-    study = 'prolific'; % indicate if study is prolific or local
+    study = 'local'; % indicate if study is prolific or local
     if strcmp(study,'local')
         subject = 'BW226';
     else
-        subject = 'TYLER_TEST';
-        %subject = '5c4ea6cc889752000156dd8e'; % 5c4ea6cc889752000156dd8e 5590a34cfdf99b729d4f69dc 66368ac547b8824e50cfa854 5fadd628cd4e9e1c42dab969 5fc58cd91b53521031a2d369 5fd5381b5807b616d910c586
+        subject = '5c4ea6cc889752000156dd8e'; % 5c4ea6cc889752000156dd8e 5590a34cfdf99b729d4f69dc 66368ac547b8824e50cfa854 5fadd628cd4e9e1c42dab969 5fc58cd91b53521031a2d369 5fd5381b5807b616d910c586
     end
     result_dir = 'L:/rsmith/lab-members/osanchez/wellbeing/blind_dating/model_output/test/';
     % specify fitted and fixed parameter values; note that fieldnames
